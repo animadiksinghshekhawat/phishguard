@@ -1,0 +1,103 @@
+{
+  "features": [
+    "UsingIP",
+    "LongURL",
+    "ShortURL",
+    "Symbol@",
+    "Redirecting//",
+    "PrefixSuffix-",
+    "SubDomains",
+    "HTTPS",
+    "DomainRegLen",
+    "Favicon",
+    "NonStdPort",
+    "HTTPSDomainURL",
+    "RequestURL",
+    "AnchorURL",
+    "LinksInScriptTags",
+    "ServerFormHandler",
+    "InfoEmail",
+    "AbnormalURL",
+    "WebsiteForwarding",
+    "StatusBarCust",
+    "DisableRightClick",
+    "UsingPopupWindow",
+    "IframeRedirection",
+    "AgeofDomain",
+    "DNSRecording",
+    "WebsiteTraffic",
+    "PageRank",
+    "GoogleIndex",
+    "LinksPointingToPage",
+    "StatsReport"
+  ],
+  "target": "class",
+  "mapping": {
+    "-1": "phishing",
+    "1": "legitimate"
+  },
+  "phishing_label": -1,
+  "legitimate_label": 1,
+  "test_size": 0.2,
+  "random_state": 42,
+  "best_model": "Random Forest",
+  "results": {
+    "Logistic Regression": {
+      "accuracy": 0.938942,
+      "precision": 0.936853,
+      "recall": 0.924413,
+      "f1": 0.930591,
+      "roc_auc": 0.98243,
+      "confusion_matrix": [
+        [
+          905,
+          74
+        ],
+        [
+          61,
+          1171
+        ]
+      ],
+      "test_samples": 2211
+    },
+    "Random Forest": {
+      "accuracy": 0.973768,
+      "precision": 0.977202,
+      "recall": 0.963228,
+      "f1": 0.970165,
+      "roc_auc": 0.994637,
+      "confusion_matrix": [
+        [
+          943,
+          36
+        ],
+        [
+          22,
+          1210
+        ]
+      ],
+      "test_samples": 2211
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.953415,
+      "precision": 0.95625,
+      "recall": 0.937692,
+      "f1": 0.94688,
+      "roc_auc": 0.991809,
+      "confusion_matrix": [
+        [
+          918,
+          61
+        ],
+        [
+          42,
+          1190
+        ]
+      ],
+      "test_samples": 2211
+    }
+  },
+  "dataset_rows": 11054,
+  "train_rows": 8843,
+  "test_rows": 2211
+}

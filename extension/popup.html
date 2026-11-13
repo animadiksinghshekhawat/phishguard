@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhishGuard AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-box">
+          <span class="logo-icon">🛡️</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">PhishGuard <span class="ai-badge">AI</span></div>
+          <div class="brand-sub">30-Signal URL Defense</div>
+        </div>
+      </div>
+      <div class="status-indicator" id="statusBadge" title="Backend ML Status">
+        <span class="pulse-dot"></span>
+        <span class="status-label">ONLINE</span>
+      </div>
+    </header>
+
+    <!-- Scan Bar -->
+    <div class="scanner-section">
+      <div class="input-wrapper">
+        <span class="input-icon">🔗</span>
+        <input type="text" id="urlInput" placeholder="https://example.com" spellcheck="false" autocomplete="off" />
+        <button id="scanBtn" class="primary-btn" title="Scan URL">
+          <span class="btn-text">Scan</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+      </div>
+      <div class="tab-target-hint">
+        <span class="hint-dot"></span>
+        <span id="tabStatusText">Active browser tab detected</span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="state-panel hidden">
+      <div class="radar-scan">
+        <div class="radar-circle circle-1"></div>
+        <div class="radar-circle circle-2"></div>
+        <div class="radar-circle circle-3"></div>
+        <div class="radar-core">🛡️</div>
+      </div>
+      <div class="loading-title">Scanning 30 Threat Signals...</div>
+      <div class="loading-steps">
+        <span class="step-tag active">URL Syntax</span>
+        <span class="step-tag active">DNS / WHOIS</span>
+        <span class="step-tag active">Page Crawler</span>
+        <span class="step-tag active">PageRank API</span>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="state-panel hidden">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title" id="errorTitle">Server Unreachable</div>
+      <div class="error-desc" id="errorDesc">
+        Make sure the backend is running locally at <code>http://127.0.0.1:5000</code>.
+      </div>
+      <button id="retryBtn" class="secondary-btn">Retry Connection</button>
+    </div>
+
+    <!-- Results Panel -->
+    <div id="resultsPanel" class="results-panel hidden">
+      
+      <!-- Verdict Card -->
+      <div class="verdict-card" id="verdictCard">
+        <div class="verdict-top">
+          <div class="score-circle-wrap">
+            <svg class="score-ring" viewBox="0 0 100 100">
+              <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+              <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="42"></circle>
+            </svg>
+            <div class="score-value-box">
+              <span class="score-num" id="scoreNum">0</span>
+              <span class="score-pct">%</span>
+            </div>
+          </div>
+          <div class="verdict-info">
+            <div class="verdict-tag" id="verdictTag">SCANNING</div>
+            <div class="verdict-meta" id="verdictMeta">Estimated Phishing Probability</div>
+            <div class="model-meta" id="modelMeta">Model: Random Forest</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Signals Grid -->
+      <div class="section-title">SECURITY SIGNALS</div>
+      <div class="signals-grid">
+        <div class="sig-card">
+          <span class="sig-icon">🔒</span>
+          <span class="sig-label">HTTPS</span>
+          <span class="sig-val" id="sigHttps">—</span>
+        </div>
+        <div class="sig-card">
+          <span class="sig-icon">📅</span>
+          <span class="sig-label">Domain Age</span>
+          <span class="sig-val" id="sigAge">—</span>
+        </div>
+        <div class="sig-card">
+          <span class="sig-icon">📊</span>
+          <span class="sig-label">PageRank</span>
+          <span class="sig-val" id="sigPR">—</span>
+        </div>
+        <div class="sig-card">
+          <span class="sig-icon">🚫</span>
+          <span class="sig-label">Blacklist</span>
+          <span class="sig-val" id="sigBlacklist">—</span>
+        </div>
+        <div class="sig-card">
+          <span class="sig-icon">🧾</span>
+          <span class="sig-label">DNS Record</span>
+          <span class="sig-val" id="sigDNS">—</span>
+        </div>
+        <div class="sig-card">
+          <span class="sig-icon">🔑</span>
+          <span class="sig-label">Password Forms</span>
+          <span class="sig-val" id="sigPW">—</span>
+        </div>
+      </div>
+
+      <!-- Threat Reasons -->
+      <div class="section-title">DETECTION REASONS</div>
+      <div class="reasons-list" id="reasonsList"></div>
+
+      <!-- Expandable All 30 Features -->
+      <div class="accordion-box">
+        <button id="toggleFeaturesBtn" class="accordion-header">
+          <span>All 30 ML Features</span>
+          <span class="arrow-icon" id="accordionArrow">▼</span>
+        </button>
+        <div id="featuresTableWrapper" class="accordion-content hidden">
+          <div class="features-grid" id="featuresGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <a href="http://127.0.0.1:5000" target="_blank" class="footer-link">Open Full Web Dashboard ↗</a>
+      <span class="footer-copy">PhishGuard AI v2.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

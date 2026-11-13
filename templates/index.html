@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhishGuard AI</title>
+
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:#edf4ff;background:#060b14;min-height:100vh}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 15%,#1677ff20,transparent 30%),radial-gradient(circle at 88% 60%,#7c3aed20,transparent 32%)}nav{height:70px;border-bottom:1px solid #ffffff12;background:#060b14cc;backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 7%;position:relative;z-index:2}.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px}.logo{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#1677ff,#753cff);box-shadow:0 0 24px #287fff44}.online{font-size:11px;font-weight:800;color:#65f6a3;border:1px solid #23e87a33;background:#23e87a0d;border-radius:30px;padding:8px 13px}.dot{display:inline-block;width:7px;height:7px;background:#25e47b;border-radius:50%;margin-right:7px;box-shadow:0 0 10px #25e47b}.hero{text-align:center;padding:76px 20px 30px;position:relative;z-index:1}.tag{display:inline-block;border:1px solid #4da1ff33;background:#4da1ff0d;color:#79baff;border-radius:30px;padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:1px}.hero h1{font-size:clamp(42px,7vw,72px);line-height:1.02;letter-spacing:-3px;margin:22px 0}.grad{background:linear-gradient(90deg,#46a9ff,#9364ff,#2de2ff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{max-width:650px;margin:auto;color:#8796ab;line-height:1.7}.scanner{max-width:850px;margin:20px auto 65px;padding:1px;border-radius:20px;background:linear-gradient(120deg,#1677ff88,#7c3aed88,#2dd4bf44);position:relative;z-index:2}.scanner-inner{background:#0b111d;border-radius:19px;padding:10px}.form{display:flex;gap:10px}.input{flex:1;border:1px solid #ffffff0b;background:#111a29;color:white;padding:18px;border-radius:12px;outline:none;font-size:14px}.input:focus{border-color:#3487ff}.button{border:0;border-radius:12px;padding:0 26px;background:linear-gradient(135deg,#1677ff,#713cff);color:white;font-weight:800;cursor:pointer;font-size:14px}.hint{font-size:10px;color:#596a80;padding:9px 4px 2px}.results,.models,.how{max-width:1050px;margin:0 auto 65px;padding:0 20px;position:relative;z-index:1}.box{background:#0c1421e8;border:1px solid #ffffff10;border-radius:20px;padding:26px;box-shadow:0 25px 70px #0005}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.muted{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:#687a91;margin-bottom:8px}.url{font-size:14px;color:#d9e3ef;word-break:break-all}.verdict{padding:12px 16px;border-radius:11px;font-size:13px;font-weight:900;white-space:nowrap}.bad{color:#ff9a9a;background:#ef444415;border:1px solid #ef444433}.good{color:#7dffb1;background:#22c55e12;border:1px solid #22c55e33}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#080f1b;border:1px solid #ffffff0a;border-radius:15px;padding:20px}.title{font-weight:800;font-size:13px;margin-bottom:18px}.scoreline{display:flex;justify-content:space-between;align-items:center}.score{font-size:42px;font-weight:900}.sub{color:#65768b;font-size:11px}.emoji{font-size:34px}.bar{height:9px;background:#1c293a;border-radius:20px;overflow:hidden;margin-top:17px}.fill{height:100%;background:linear-gradient(90deg,#19d87a,#ffd43b,#ff4652);border-radius:20px}.reason{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #ffffff09;color:#b8c5d5;font-size:12px;line-height:1.5}.reason:last-child{border:0}.signals{margin-top:16px}.signalgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.signal{background:#0c1523;border:1px solid #ffffff08;border-radius:12px;padding:15px}.si{font-size:18px;margin-bottom:9px}.sn{color:#687a91;font-size:9px;text-transform:uppercase;letter-spacing:.7px}.sv{margin-top:5px;font-size:12px;font-weight:800}.sv.bad-val{color:#ff9a9a}.sv.good-val{color:#7dffb1}.heading{text-align:center;margin-bottom:28px}.heading h2{margin:0 0 8px;font-size:29px}.heading p{margin:0;color:#65768b;font-size:13px}.modelgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.model{background:#0b1320;border:1px solid #ffffff0a;border-radius:14px;padding:18px}.model.best{border-color:#368cff66;box-shadow:0 0 25px #1677ff0c}.mname{font-size:13px;font-weight:800}.acc{font-size:29px;font-weight:900;margin:10px 0}.mini{color:#687a91;font-size:11px}.bestlabel{display:inline-block;color:#69b2ff;background:#3182ff14;border:1px solid #3182ff33;border-radius:20px;padding:5px 8px;font-size:9px;font-weight:800;margin-top:8px}.compare-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.compare-metrics div{background:#0c1523;border:1px solid #ffffff08;border-radius:11px;padding:13px}.compare-metrics span{display:block;color:#687a91;font-size:9px;text-transform:uppercase;letter-spacing:.7px}.compare-metrics strong{display:block;margin-top:6px;font-size:20px}.best-heading{margin-top:62px}.best-detail{max-width:900px;margin:0 auto}.best-header{display:flex;align-items:center;justify-content:space-between;gap:16px}.metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}.metric-grid div{background:#0c1523;border:1px solid #ffffff08;border-radius:12px;padding:14px;text-align:center}.metric-grid span{display:block;color:#687a91;font-size:9px;text-transform:uppercase;letter-spacing:.7px}.metric-grid strong{display:block;margin-top:7px;font-size:20px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step{background:#0b1320;border:1px solid #ffffff0a;border-radius:15px;padding:21px}.num{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#3182ff18;color:#69b2ff;font-weight:900;margin-bottom:14px}.step h3{font-size:14px;margin:0 0 7px}.step p{color:#687a91;font-size:12px;line-height:1.6;margin:0}.feat-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px}.feat-table th{text-align:left;color:#687a91;font-size:9px;text-transform:uppercase;letter-spacing:.7px;padding:7px 10px;border-bottom:1px solid #ffffff0a}.feat-table td{padding:7px 10px;border-bottom:1px solid #ffffff07}.feat-badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:800}.feat-badge.phish{color:#ff9a9a;background:#ef444415;border:1px solid #ef444430}.feat-badge.legit{color:#7dffb1;background:#22c55e10;border:1px solid #22c55e30}.feat-badge.neutral{color:#687a91;background:#1c293a;border:1px solid #ffffff10}footer{text-align:center;border-top:1px solid #ffffff0a;padding:24px;color:#435268;font-size:11px}@media(max-width:800px){.grid{grid-template-columns:1fr}.signalgrid{grid-template-columns:repeat(2,1fr)}.modelgrid,.steps{grid-template-columns:1fr}.metric-grid{grid-template-columns:repeat(2,1fr)}.best-header{flex-direction:column;align-items:flex-start}}@media(max-width:600px){nav{padding:0 20px}.online{display:none}.form{flex-direction:column}.button{padding:16px}.top{flex-direction:column;align-items:flex-start}.box{padding:18px}.signalgrid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="brand"><div class="logo">🛡️</div>PhishGuard AI</div>
+  <div class="online"><span class="dot"></span>30-FEATURE ENGINE ONLINE</div>
+</nav>
+
+<section class="hero">
+  <div class="tag">🤖 ML + DNS + WHOIS + SURBL + PageRank</div>
+  <h1>Detect phishing<br><span class="grad">before it detects you.</span></h1>
+  <p>Analyses all 30 UCI phishing-dataset features in real-time — URL structure, domain age, DNS records, blacklist lookups, page content, and reputation signals.</p>
+</section>
+
+<section class="scanner">
+  <div class="scanner-inner">
+    <form class="form" method="post" action="/">
+      <input class="input" name="url" value="{{url}}" placeholder="https://example.com" required>
+      <button class="button" type="submit">🔍 Analyse URL</button>
+    </form>
+    <div class="hint">Full 30-feature analysis • WHOIS + DNS + SURBL + live page check</div>
+  </div>
+</section>
+
+{% if result %}
+<section class="results">
+  <div class="box">
+
+    <div class="top">
+      <div>
+        <div class="muted">Analysis complete • {{result.model}}</div>
+        <div class="url">{{url}}</div>
+      </div>
+      <div class="verdict {{'bad' if result.prediction=='PHISHING' else 'good'}}">
+        {{'🚨 PHISHING DETECTED' if result.prediction=='PHISHING' else '✓ LIKELY LEGITIMATE'}}
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- Risk Assessment -->
+      <div class="card">
+        <div class="title">Risk Assessment</div>
+        <div class="scoreline">
+          <div>
+            <div class="score">{{result.score}}%</div>
+            <div class="sub">Estimated phishing probability</div>
+          </div>
+          <div class="emoji">
+            {{'🔴' if result.score >= 70 else ('🟠' if result.score >= 40 else '🟢')}}
+          </div>
+        </div>
+        <div class="bar">
+          <div class="fill" style="width:{{result.score}}%"></div>
+        </div>
+        <div class="sub" style="margin-top:12px">
+          Best model test accuracy: {{result.model_accuracy}}%
+        </div>
+      </div>
+
+      <!-- Detection Analysis -->
+      <div class="card">
+        <div class="title">Detection Analysis</div>
+        {% for r in result.reasons %}
+        <div class="reason">
+          <span>{{'⚠️' if result.prediction=='PHISHING' else 'ℹ️'}}</span>
+          <span>{{r}}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+    </div><!-- /grid -->
+
+    {% if result.features %}
+    <!-- Security Signals -->
+    <div class="card signals" style="margin-top:16px">
+      <div class="title">Security Signals</div>
+      <div class="signalgrid">
+
+        <div class="signal">
+          <div class="si">🔒</div>
+          <div class="sn">HTTPS</div>
+          <div class="sv {{'good-val' if result.features.https=='Yes' else 'bad-val'}}">{{result.features.https}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🌐</div>
+          <div class="sn">IP Address</div>
+          <div class="sv {{'bad-val' if result.features.ip=='Yes' else 'good-val'}}">{{result.features.ip}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">📏</div>
+          <div class="sn">URL Length</div>
+          <div class="sv {{'bad-val' if result.features.url_length >= 75 else ('good-val' if result.features.url_length < 54 else '')}}">{{result.features.url_length}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🔗</div>
+          <div class="sn">Subdomains</div>
+          <div class="sv {{'bad-val' if result.features.subdomains >= 2 else 'good-val'}}">{{result.features.subdomains}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">📅</div>
+          <div class="sn">Domain Age</div>
+          <div class="sv">{{result.features.domain_age}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🧾</div>
+          <div class="sn">DNS Records</div>
+          <div class="sv {{'good-val' if result.features.dns_records=='Yes' else ('bad-val' if result.features.dns_records=='No' else '')}}">{{result.features.dns_records}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🚫</div>
+          <div class="sn">Blacklisted</div>
+          <div class="sv {{'bad-val' if 'Yes' in result.features.blacklisted else 'good-val'}}">{{result.features.blacklisted}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">📊</div>
+          <div class="sn">PageRank</div>
+          <div class="sv">{{result.features.pagerank}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">↪️</div>
+          <div class="sn">Redirects</div>
+          <div class="sv {{'bad-val' if result.features.redirects is not string and result.features.redirects >= 4 else ''}}">{{result.features.redirects}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">📝</div>
+          <div class="sn">Forms</div>
+          <div class="sv">{{result.features.forms}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🔑</div>
+          <div class="sn">Password Fields</div>
+          <div class="sv {{'bad-val' if result.features.password_fields is not string and result.features.password_fields > 0 else ''}}">{{result.features.password_fields}}</div>
+        </div>
+
+        <div class="signal">
+          <div class="si">🖼️</div>
+          <div class="sn">IFrames</div>
+          <div class="sv {{'bad-val' if result.features.iframes is not string and result.features.iframes >= 3 else ''}}">{{result.features.iframes}}</div>
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Full 30-Feature Breakdown -->
+    {% if result.flags %}
+    <div class="card" style="margin-top:16px">
+      <div class="title">All 30 Feature Analysis</div>
+      <table class="feat-table">
+        <thead>
+          <tr>
+            <th>Feature</th><th>Status</th>
+            <th>Feature</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set feat_items = result.flags.items() | list %}
+          {% for i in range(0, feat_items|length, 2) %}
+          <tr>
+            <td>{{ feat_items[i][0] }}</td>
+            <td>
+              {% if feat_items[i][1] == -1 %}
+                <span class="feat-badge phish">⚠ Suspicious</span>
+              {% elif feat_items[i][1] == 1 %}
+                <span class="feat-badge legit">✓ Benign</span>
+              {% else %}
+                <span class="feat-badge neutral">— Unknown</span>
+              {% endif %}
+            </td>
+            {% if i+1 < feat_items|length %}
+            <td>{{ feat_items[i+1][0] }}</td>
+            <td>
+              {% if feat_items[i+1][1] == -1 %}
+                <span class="feat-badge phish">⚠ Suspicious</span>
+              {% elif feat_items[i+1][1] == 1 %}
+                <span class="feat-badge legit">✓ Benign</span>
+              {% else %}
+                <span class="feat-badge neutral">— Unknown</span>
+              {% endif %}
+            </td>
+            {% else %}
+            <td></td><td></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div><!-- /box -->
+</section>
+{% endif %}
+
+<!-- Model Comparison -->
+<section class="models">
+  <div class="heading">
+    <h2>Model Performance</h2>
+    <p>Three classifiers trained on the UCI phishing dataset — the best is used automatically.</p>
+  </div>
+  <div class="modelgrid">
+    {% for name, r in model_results.items() %}
+    <div class="model {{'best' if name==best_model else ''}}">
+      <div class="mname">{{name}}</div>
+      <div class="acc">{{(r.accuracy*100)|round(2)}}%</div>
+      <div class="mini">Test accuracy</div>
+      {% if name==best_model %}<div class="bestlabel">★ ACTIVE MODEL</div>{% endif %}
+      <div class="compare-metrics">
+        <div><span>Precision</span><strong>{{(r.precision*100)|round(1)}}%</strong></div>
+        <div><span>Recall</span><strong>{{(r.recall*100)|round(1)}}%</strong></div>
+        <div><span>F1</span><strong>{{(r.f1*100)|round(1)}}%</strong></div>
+        <div><span>ROC-AUC</span><strong>{{r.roc_auc|round(4)}}</strong></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="how">
+  <div class="heading">
+    <h2>How It Works</h2>
+    <p>Five layers of detection run concurrently in real-time.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="num">01</div>
+      <h3>URL Structure (8 features)</h3>
+      <p>Analyses length, IP usage, shorteners, hyphens, @ symbols, subdomain depth, HTTPS, and non-standard ports — instantly, with no network calls.</p>
+    </div>
+    <div class="step">
+      <div class="num">02</div>
+      <h3>DNS & WHOIS (4 features)</h3>
+      <p>Checks domain age, registration length, DNS existence, and SURBL blacklist status using live lookups run in parallel.</p>
+    </div>
+    <div class="step">
+      <div class="num">03</div>
+      <h3>Page Content (10 features)</h3>
+      <p>Fetches the live page and analyses forms, iframes, favicon origin, external resources, JS behaviour, and redirect chains.</p>
+    </div>
+    <div class="step">
+      <div class="num">04</div>
+      <h3>Reputation (4 features)</h3>
+      <p>Estimates PageRank, global traffic, backlinks, and Google indexing using the Open PageRank API and domain-trust heuristics.</p>
+    </div>
+    <div class="step">
+      <div class="num">05</div>
+      <h3>ML Classification</h3>
+      <p>All 30 features feed into a Random Forest (97.4% accuracy) trained on 11,054 labelled URLs. The highest of ML score and guardrail score is used.</p>
+    </div>
+    <div class="step">
+      <div class="num">06</div>
+      <h3>Blended Score</h3>
+      <p>Deterministic safety guardrails prevent high-confidence phishing patterns from being masked by neutral feature values.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  PhishGuard AI • 30-Feature AI-Based Phishing Detection • WHOIS + DNS + SURBL + Open PageRank
+</footer>
+</body>
+</html>
