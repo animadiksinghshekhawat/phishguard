@@ -71,9 +71,13 @@ _TRUST_TLDS: frozenset[str] = frozenset({".gov", ".edu", ".mil"})
 _PAGE_TIMEOUT  = 7
 _WHOIS_TIMEOUT = 9
 _DNS_TIMEOUT   = 4
-_OPR_TIMEOUT   = 5   # Open PageRank API
+_OPR_TIMEOUT   = 8   # Open PageRank API
+_DEFAULT_OPR_KEY = "opr_live_dce9694126ffbd5370b010c2d8943332325790f7"
 
-_OPR_API_KEY   = os.getenv("OPENPAGERANK_API_KEY", "opr_live_dce9694126ffbd5370b010c2d8943332325790f7")
+def _get_opr_key() -> str:
+    env_val = (os.getenv("OPENPAGERANK_API_KEY") or "").strip()
+    return env_val if env_val else _DEFAULT_OPR_KEY
+
 _OPR_ENDPOINT  = "https://openpagerank.keywordseverywhere.com/api/v1.0/getPageRank"
 
 _HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; PhishGuardAI/2.0)"}
@@ -157,22 +161,62 @@ def _fetch_page(url: str) -> tuple[object | None, str, int]:
         return None, "", 0
 
 
-def _fetch_whois(domain: str) -> object | None:
-    """WHOIS lookup with hard timeout. Returns object or None."""
-    if not _WHOIS:
-        return None
-    result: list[object | None] = [None]
+def _fetch_domain_dates(domain: str) -> tuple[datetime | None, datetime | None, str | None]:
+    """
+    Returns (created_dt, expires_dt, registrar_str).
+    Uses HTTPS RDAP (ICANN standard, works on Linux/Docker/Cloud) with python-whois fallback.
+    """
+    reg_domain = _registrable(domain)
+    created_dt, expires_dt, registrar_str = None, None, None
 
-    def _run() -> None:
+    # 1. Try RDAP over HTTPS (ICANN standard, works reliably across all TLDs without port 43)
+    if _REQUESTS:
         try:
-            result[0] = _whois_lib.query(domain)
+            r = _req.get(
+                f"https://rdap.org/domain/{reg_domain}",
+                timeout=6,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            )
+            if r.status_code == 200:
+                data = r.json()
+                for ev in data.get("events", []):
+                    act = ev.get("eventAction")
+                    dt_str = ev.get("eventDate")
+                    if act == "registration" and dt_str:
+                        created_dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                    elif act == "expiration" and dt_str:
+                        expires_dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                for ent in data.get("entities", []):
+                    if "registrar" in ent.get("roles", []):
+                        vcard = ent.get("vcardArray", [])
+                        if len(vcard) > 1:
+                            for item in vcard[1]:
+                                if len(item) > 3 and item[0] == "fn":
+                                    registrar_str = str(item[3])
         except Exception:
             pass
 
-    t = threading.Thread(target=_run, daemon=True)
-    t.start()
-    t.join(timeout=_WHOIS_TIMEOUT)
-    return result[0]
+    # 2. Fallback to python-whois if RDAP was unavailable or incomplete
+    if (not created_dt or not expires_dt) and _WHOIS:
+        try:
+            w = _whois_lib.query(reg_domain)
+            if w:
+                if not created_dt and getattr(w, "creation_date", None):
+                    c = w.creation_date[0] if isinstance(w.creation_date, list) else w.creation_date
+                    if isinstance(c, datetime):
+                        if c.tzinfo is None: c = c.replace(tzinfo=timezone.utc)
+                        created_dt = c
+                if not expires_dt and getattr(w, "expiration_date", None):
+                    e = w.expiration_date[0] if isinstance(w.expiration_date, list) else w.expiration_date
+                    if isinstance(e, datetime):
+                        if e.tzinfo is None: e = e.replace(tzinfo=timezone.utc)
+                        expires_dt = e
+                if not registrar_str and getattr(w, "registrar", None):
+                    registrar_str = str(w.registrar)
+        except Exception:
+            pass
+
+    return created_dt, expires_dt, registrar_str
 
 
 def _check_dns(domain: str) -> bool:
@@ -203,17 +247,17 @@ def _surbl_listed(domain: str) -> bool:
 
 def _open_pagerank(domain: str) -> dict:
     """
-    Query the Open PageRank API (https://www.domcop.com/openpagerank/).
-    Free tier — sign up for a key and set OPENPAGERANK_API_KEY env-var.
-
+    Query the Open PageRank API (https://openpagerank.keywordseverywhere.com).
     Returns dict with keys: 'page_rank_decimal' (0–10), 'rank' (global), or {}.
     """
-    if not _REQUESTS or not _OPR_API_KEY:
+    key = _get_opr_key()
+    if not _REQUESTS or not key:
         return {}
     try:
         headers = {
-            "API-OPR": _OPR_API_KEY,
-            "Authorization": f"Bearer {_OPR_API_KEY}"
+            "API-OPR": key,
+            "Authorization": f"Bearer {key}",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
         r = _req.get(
             _OPR_ENDPOINT,
@@ -490,7 +534,7 @@ def extract_features(
 
     # ── Concurrent network calls ──────────────────────────────────────────────
     _page  = [None, "", 0]          # (response, html, redirect_count)
-    _w     = [None]                 # whois object
+    _dates = [None, None, None]     # (created_dt, expires_dt, registrar_str)
     _dns   = [False]                # DNS resolves?
     _surbl = [False]                # SURBL listed?
     _opr   = [{}]                   # Open PageRank data
@@ -499,9 +543,9 @@ def extract_features(
         if p.scheme in ("http", "https"):
             _page[0], _page[1], _page[2] = _fetch_page(u)
 
-    def do_whois() -> None:
+    def do_dates() -> None:
         if not _is_ip(domain):
-            _w[0] = _fetch_whois(_registrable(domain))
+            _dates[0], _dates[1], _dates[2] = _fetch_domain_dates(domain)
 
     def do_dns() -> None:
         _dns[0] = _check_dns(domain)
@@ -515,7 +559,7 @@ def extract_features(
 
     threads = [
         threading.Thread(target=do_page,  daemon=True),
-        threading.Thread(target=do_whois, daemon=True),
+        threading.Thread(target=do_dates, daemon=True),
         threading.Thread(target=do_dns,   daemon=True),
         threading.Thread(target=do_surbl, daemon=True),
         threading.Thread(target=do_opr,   daemon=True),
@@ -527,21 +571,19 @@ def extract_features(
         t.join(timeout=max_wait)
 
     resp, html, redirect_count = _page
-    w        = _w[0]
-    has_dns_ = _dns[0]
-    is_surbl = _surbl[0]
-    opr_data = _opr[0]
+    cre_d, exp_d, reg_str      = _dates
+    has_dns_                   = _dns[0]
+    is_surbl                   = _surbl[0]
+    opr_data                   = _opr[0]
 
-    # Computed WHOIS values used by multiple features
-    age_d = _age_days(w)
-    exp_d = _whois_expires(w)
-    cre_d = _whois_created(w)
+    # Computed age in days
+    age_d = max(0, (datetime.now(timezone.utc) - cre_d).days) if cre_d else None
 
     # HTML analysis
     hd = _analyze_html(html, domain) if html else None
 
     # ── Update page_meta for the UI panel ─────────────────────────────────────
-    meta["redirects"]  = redirect_count
+    meta["redirects"]   = redirect_count
     meta["dns_records"] = "Yes" if has_dns_ else "No"
     meta["blacklisted"] = "Yes ⚠️" if is_surbl else "No"
     if hd:
@@ -555,15 +597,13 @@ def extract_features(
         yrs = age_d // 365
         mns = (age_d % 365) // 30
         meta["domain_age"] = f"{yrs}y {mns}m" if yrs else f"{mns}m"
-    if w:
+    if reg_str:
+        meta["registrar"] = reg_str[:60]
+    if opr_data and opr_data.get("page_rank_decimal") is not None and str(opr_data.get("page_rank_decimal")) != "":
         try:
-            meta["registrar"] = str(getattr(w, "registrar", None) or "Unknown")[:60]
-        except Exception:
+            meta["pagerank"] = round(float(opr_data["page_rank_decimal"]), 2)
+        except (ValueError, TypeError):
             pass
-    if opr_data:
-        pr_val = opr_data.get("page_rank_decimal", None)
-        if pr_val is not None:
-            meta["pagerank"] = round(float(pr_val), 2)
 
     # ═════════════════════════════════════════════════════════════════════════
     # Individual feature computation
