@@ -57,8 +57,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (url.startsWith("http://") || url.startsWith("https://")) {
         urlInput.value = url;
         tabStatusText.textContent = `Current tab: ${new URL(url).hostname}`;
-        // Auto-scan on launch
-        handleScan(url);
+        // Check background auto-scan cache for instant 0ms result
+        try {
+          chrome.runtime.sendMessage({ action: "getCachedScan", url }, (response) => {
+            if (response && response.result) {
+              setBackendStatus(true);
+              renderResults(response.result);
+            } else {
+              handleScan(url);
+            }
+          });
+        } catch (_) {
+          handleScan(url);
+        }
       } else {
         tabStatusText.textContent = "Browser system page (paste any external URL below)";
         urlInput.placeholder = "Paste a URL to scan (e.g. https://example.com)";
