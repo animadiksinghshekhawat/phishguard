@@ -1,6 +1,6 @@
 // popup.js — PhishGuard AI Chrome Extension Logic
 
-const API_ENDPOINT = "http://127.0.0.1:5000/api/check";
+const API_ENDPOINT = "https://phishguard-ai-cxug.onrender.com/api/check";
 
 // Elements
 const urlInput = document.getElementById("urlInput");

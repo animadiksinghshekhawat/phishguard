@@ -24,7 +24,8 @@
   ],
   "host_permissions": [
     "http://127.0.0.1:5000/*",
-    "http://localhost:5000/*"
+    "http://localhost:5000/*",
+    "https://phishguard-ai-cxug.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"
